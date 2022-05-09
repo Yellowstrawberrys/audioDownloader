@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferStrategy;
 import java.io.File;
 
 public class Main extends JFrame implements Runnable {
@@ -24,10 +25,13 @@ public class Main extends JFrame implements Runnable {
     MainPanel mainPanel = new MainPanel();
 
     public Main(){
-        super("Fuck");
+        super("Audio Downloader");
         setSize(960, 540);
         Thread th = new Thread(this);
         th.start();
+        BufferStrategy bufferStrategy = getBufferStrategy();
+        createBufferStrategy(3);
+        bufferStrategy.show();
         addWindowListener(new WindowListener());
         add(mainPanel);
         Dimension d = new Dimension();

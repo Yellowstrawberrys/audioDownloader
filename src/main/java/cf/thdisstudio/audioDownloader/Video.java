@@ -33,6 +33,7 @@ public class Video extends Button {
     public final String uploader;
     public final String thumbnail;
     public final File target;
+    public final long duration;
 
     public String status;
     Loader loader;
@@ -44,6 +45,7 @@ public class Video extends Button {
         uploader = info.getString("uploader");
         thumbnail = info.getString("thumbnail");
         id = info.getString("id");
+        duration = info.getLong("duration");
         target = new File(downloadFolder+"/"+title+".mp3");
         System.out.println("Finished Loading Things");
         setBackground(Color.decode("#969696"));
@@ -146,6 +148,8 @@ public class Video extends Button {
         @Override
         public void mouseClicked(MouseEvent e) {
             Main.playerManager.play(target);
+            Main.playerManager.video = Video.this;
+            Main.main.mainPanel.playerPanel.repaint();
         }
     }
 }
