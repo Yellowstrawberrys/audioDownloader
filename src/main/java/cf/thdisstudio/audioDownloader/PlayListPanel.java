@@ -1,5 +1,6 @@
 package cf.thdisstudio.audioDownloader;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -7,14 +8,13 @@ import java.io.IOException;
 
 import static cf.thdisstudio.audioDownloader.Main.playerManager;
 
-public class PlayListPanel extends Panel {
+public class PlayListPanel extends JPanel {
 
     TextField url = new TextField();
 
     public PlayListPanel(){
         setBackground(Color.decode("#b4b4b4"));
         url.setBackground(Color.decode("#828282"));
-
         add(url);
         setLayout(null);
         url.addKeyListener(new KeyListener());

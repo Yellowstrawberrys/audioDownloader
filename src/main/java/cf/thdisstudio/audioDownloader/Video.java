@@ -61,36 +61,58 @@ public class Video extends Button {
         super.repaint();
     }
 
+    int width = 0;
+    int height = 0;
+    BufferedImage img = null;
+
     @Override
     public void paint(Graphics gr) {
         super.paint(gr);
-        Graphics2D g = (Graphics2D) gr;
+        if(img == null || width != ((int) (getWidth()*1.5)) || height != ((int) (getHeight()*1.5))){
+            onChanged();
+        }
+        gr.drawImage(img, 0,0, getWidth(), getHeight(), null);
+    }
+
+    @Override
+    public void update(Graphics g) {
+        super.update(g);
+        paint(g);
+    }
+
+    public void onChanged(){
         try {
-            BufferedImage img = ImageIO.read(getImgFromURL("http://i3.ytimg.com/vi/%s/maxresdefault.jpg".formatted(id)));
-            g.drawImage(cropImage(img, img.getHeight(), img.getHeight(), img.getWidth()/4, 0), (int) (getWidth()*0.03), (int) (getHeight()*0.15),
-                    (int) (getHeight()*0.65f), (int) (getHeight()*0.65f),null);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        g.setColor(Color.WHITE);
-        g.setFont(FontGetter.customFont("font1", (getHeight())*0.21f));
-        g.drawString(title, (int) (getWidth()*0.21), (int) (getHeight()*0.5));
-
-        g.setColor(Color.decode("#7d7d7d"));
-        g.setFont(FontGetter.customFont("font1", (getHeight())*0.14f));
-        g.drawString(uploader, (int) (getWidth()*0.209), (int) (getHeight()*0.66));
-
-        g.setStroke(new BasicStroke((int) (getHeight()*0.06)));
-        g.setColor(Color.GREEN);
-        if(isEnabled())
-            g.drawLine(0, (int) (getHeight()*0.97), getWidth(), (int) (getHeight()*0.97));
-        else{
-            g.setColor(new Color(0,0,0, 0.5f));
-            g.fillRect(0,0, getWidth(), getHeight());
+            width = (int) (getWidth()*1.5);
+            height = (int) (getHeight()*1.5);
+            img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = img.createGraphics();
+            try {
+                BufferedImage img = ImageIO.read(getImgFromURL("http://i3.ytimg.com/vi/%s/maxresdefault.jpg".formatted(id)));
+                g.drawImage(cropImage(img, img.getHeight(), img.getHeight(), img.getWidth() / 4, 0), (int) (width * 0.03), (int) (height * 0.15),
+                        (int) (height * 0.65f), (int) (height * 0.65f), null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             g.setColor(Color.WHITE);
-            g.setFont(FontGetter.customFont("font1", (getHeight())*0.4f));
-            g.drawString("DOWNLOADING", getWidth()*0.15f, getHeight()*0.6f);
-        }
+            g.setFont(FontGetter.customFont("font1", (height) * 0.21f));
+            g.drawString(title, (int) (width * 0.21), (int) (height * 0.5));
+
+            g.setColor(Color.decode("#7d7d7d"));
+            g.setFont(FontGetter.customFont("font1", (height) * 0.14f));
+            g.drawString(uploader, (int) (width * 0.209), (int) (height * 0.66));
+
+            g.setStroke(new BasicStroke((int) (height * 0.06)));
+            g.setColor(Color.GREEN);
+            if (isEnabled())
+                g.drawLine(0, (int) (height * 0.97), width, (int) (height * 0.97));
+            else {
+                g.setColor(new Color(0, 0, 0, 0.5f));
+                g.fillRect(0, 0, width, height);
+                g.setColor(Color.WHITE);
+                g.setFont(FontGetter.customFont("font1", (height) * 0.4f));
+                g.drawString("DOWNLOADING", width * 0.15f, height * 0.6f);
+            }
+        }catch (IllegalArgumentException e){}
     }
 
     class Loader extends Thread{
@@ -108,6 +130,7 @@ public class Video extends Button {
                 }else
                     disabled = false;
                 setEnabled(!disabled);
+                onChanged();
                 repaint();
             }catch (Exception e){
                 e.printStackTrace();
@@ -116,7 +139,16 @@ public class Video extends Button {
 
         public void convert() throws Exception{
             status = "Converting";
-            File source = new File(Main.tmp+"/"+title+".mp4");
+            File source = new File(Main.tmp+"/"+title
+                    .replaceAll("<", "")
+                    .replaceAll(">", "")
+                    .replaceAll(":", "")
+                    .replaceAll("\"", "")
+                    .replaceAll("/", "")
+                    .replaceAll("\\\\", "")
+                    .replaceAll("\\|", "")
+                    .replaceAll("\\?", "")
+                    .replaceAll("\\*", "")+".mp4");
 
             //Audio Attributes
             AudioAttributes audio = new AudioAttributes();

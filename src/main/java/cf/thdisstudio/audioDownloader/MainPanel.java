@@ -12,14 +12,6 @@ public class MainPanel extends JPanel {
         setLayout(new BorderLayout());
         add(playListPanel, BorderLayout.WEST);
         add(playerPanel, BorderLayout.CENTER);
-
-        playListPanel.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                playListPanel.resized();
-                System.out.println("FUCK");
-            }
-        });
     }
 
     @Override
