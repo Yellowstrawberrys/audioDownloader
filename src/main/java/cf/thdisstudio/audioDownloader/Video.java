@@ -24,7 +24,7 @@ import static cf.thdisstudio.audioDownloader.Main.downloadFolder;
 import static cf.thdisstudio.audioDownloader.Tool.cropImage;
 import static cf.thdisstudio.audioDownloader.Tool.getImgFromURL;
 
-public class Video extends Button {
+public class Video extends JButton {
 
     public final JSONObject info;
     public final String title;
@@ -48,36 +48,35 @@ public class Video extends Button {
         duration = info.getLong("duration");
         target = new File(downloadFolder+"/"+title+".mp3");
         System.out.println("Finished Loading Things");
-        setBackground(Color.decode("#969696"));
+        setOpaque(true);
+        setForeground(Color.decode("#969696"));
         System.out.println(getWidth());
         setVisible(true);
         loader = new Loader();
         loader.start();
+        setContentAreaFilled(false);
         addMouseListener(new MouseListener());
-    }
-
-    @Override
-    public void repaint() {
-        super.repaint();
     }
 
     int width = 0;
     int height = 0;
     BufferedImage img = null;
+    boolean isEntered = false;
 
     @Override
-    public void paint(Graphics gr) {
-        super.paint(gr);
+    public void paintComponent(Graphics gr) {
+        super.paintComponent(gr);
         if(img == null || width != ((int) (getWidth()*1.5)) || height != ((int) (getHeight()*1.5))){
             onChanged();
         }
         gr.drawImage(img, 0,0, getWidth(), getHeight(), null);
+        gr.dispose();
     }
 
     @Override
     public void update(Graphics g) {
         super.update(g);
-        paint(g);
+        paintComponent(g);
     }
 
     public void onChanged(){
@@ -103,9 +102,16 @@ public class Video extends Button {
 
             g.setStroke(new BasicStroke((int) (height * 0.06)));
             g.setColor(Color.GREEN);
-            if (isEnabled())
+            if (isEnabled()) {
                 g.drawLine(0, (int) (height * 0.97), width, (int) (height * 0.97));
-            else {
+                if(isEntered){
+                    g.setColor(new Color(0, 0, 0, 0.5f));
+                    g.fillRect(0, 0, width, height);
+                    g.setColor(Color.WHITE);
+                    g.setFont(FontGetter.customFont("font1", (height) * 0.4f));
+                    g.drawString("Play", (int) (width * 0.15f), (int) (height * 0.6f));
+                }
+            }else {
                 g.setColor(new Color(0, 0, 0, 0.5f));
                 g.fillRect(0, 0, width, height);
                 g.setColor(Color.WHITE);
@@ -179,9 +185,21 @@ public class Video extends Button {
     class MouseListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            Main.playerManager.play(target);
+            Main.playerManager.play(Video.this);
             Main.playerManager.video = Video.this;
             Main.main.mainPanel.playerPanel.repaint();
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            isEntered = true;
+            onChanged();
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            isEntered = false;
+            onChanged();
         }
     }
 }

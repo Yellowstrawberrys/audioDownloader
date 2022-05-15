@@ -16,7 +16,7 @@ dependencies {
     implementation 'cf.ystapi:ystapi:BETA-0.0.2.5'
     implementation 'org.json:json:20220320'
     implementation 'commons-io:commons-io:2.11.0'
-    implementation 'io.github.yellowstrawberrys:jlayer:1.1.0'
+    implementation 'io.github.yellowstrawberrys:jlayer:1.1.1'
 
 
     implementation(group: 'ws.schild', name: 'jave-all-deps', version: '3.3.1')

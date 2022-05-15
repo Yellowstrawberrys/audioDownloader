@@ -19,39 +19,14 @@ import static cf.thdisstudio.audioDownloader.Tool.getImgFromURL;
 public class PlayerPanel extends JPanel {
 
     Graphics2D gr2D;
-    JProgressBar jProgressBar = new JProgressBar();
+    ControlButton controlButton = new ControlButton();
 
     public PlayerPanel(){
         setBackground(Color.decode("#545454"));
         setIgnoreRepaint(true);
         setDoubleBuffered(true);
-        Timer timer = new Timer(1000, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(Main.playerManager.video != null) repaint();
-            }
-        });
-        timer.start();
-//        jProgressBar.setVisible(false);
-//        jProgressBar.setBackground(Color.WHITE);
-//        jProgressBar.setMaximum(100);
-//        createBufferStrategy(2);
-//        getBufferStrategy().show();
-//        new Thread(() -> {
-//            while (isVisible())
-//                try {
-////                    SwingUtilities.invokeAndWait(() -> {
-////                        if(Main.playerManager.video != null) {
-////                            repaint();
-////                        }
-////                    });
-//                    validate();
-//                    repaint();
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//        }).start();
+        setLayout(null);
+        add(controlButton);
     }
 
     String id = "";
@@ -60,15 +35,11 @@ public class PlayerPanel extends JPanel {
     BufferedImage layer1 = null;
 //
     @Override
-    public void update(Graphics g) {
-        paint(g);
-    }
-
-    @Override
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
         if(Main.playerManager.video != null) {
             if(!id.equals(Main.playerManager.video.id)){
                 createBackground();
+                id = Main.playerManager.video.id;
             }
             gr2D = (Graphics2D) g;
 
@@ -76,12 +47,12 @@ public class PlayerPanel extends JPanel {
                 gr2D.drawImage(cropImage(background, background.getWidth()-20, background.getHeight()-20, 10, 10), 0, 0, getWidth(), getHeight(), null);
                 gr2D.drawImage(cropImage(thumbnail, thumbnail.getHeight(), thumbnail.getHeight(), thumbnail.getWidth() / 4, 0), (int) (getWidth()*0.05f), (int) (getHeight()*0.25f), (int) (getHeight()*0.35f), (int) (getHeight()*0.35f), null);
                 gr2D.drawImage(layer1, 0, 0, getWidth(), getHeight(),null);
-                if(Main.playerManager.video != null && !Main.playerManager.player.isComplete()) {
+                if(Main.playerManager.video != null) {
                     gr2D.setStroke(new BasicStroke((int) (getHeight()*0.03f)));
                     gr2D.setColor(Color.WHITE);
-                    gr2D.drawLine(50, (int) (getHeight()*0.7f), (int) ((getWidth() - 50) * ((float) Main.playerManager.player.getPosition()) / (Main.playerManager.video.duration*1000f))+50, (int) (getHeight()*0.7f));
+                    gr2D.drawLine(50, (int) (getHeight()*0.7f), (int) ((getWidth() - 50) * ((float) (Main.playerManager.lastPosition+Main.playerManager.player.getPosition())) / (Main.playerManager.video.duration*1000f))+50, (int) (getHeight()*0.7f));
                     gr2D.setFont(customFont("font1", getHeight()*0.03f));
-                    long d = Main.playerManager.player.getPosition();
+                    long d = Main.playerManager.lastPosition+Main.playerManager.player.getPosition();
                     gr2D.drawString(String.format("%02d:%02d:%02d",
                             TimeUnit.MILLISECONDS.toHours(d) -
                                     TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(d)), // The change is in this line
@@ -95,8 +66,7 @@ public class PlayerPanel extends JPanel {
                     createBackground();
                 else e.printStackTrace();
             }
-        }else
-            jProgressBar.setVisible(false);
+        }
     }
 
     public void createBackground(){
@@ -151,5 +121,19 @@ public class PlayerPanel extends JPanel {
         gr2DL.setColor(new Color(0, 0, 0, 0.4f));
         gr2DL.drawLine(75, (int) (layer1.getHeight()*0.7f), layer1.getWidth()-75, (int) (layer1.getHeight()*0.7f));
         gr2DL.dispose();
+    }
+
+    public void resized(){
+        if(Main.playerManager.video != null) {
+            createBackground();
+        }
+        //controlButton.setPreferredSize(new Dimension((int) (getHeight()*0.2), (int) (getHeight()*0.3)));
+        controlButton.setBounds((int) (getWidth()/2-(getHeight()*0.1)), (int) (getHeight()*0.8),(int) (getHeight()*0.1), (int) (getHeight()*0.1));
+        controlButton.revalidate();
+        controlButton.repaint();
+    }
+
+    public boolean isPlaying(){
+        return Main.playerManager.isPlaying;
     }
 }

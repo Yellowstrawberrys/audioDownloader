@@ -33,6 +33,7 @@ public class PlayListPanel extends JPanel {
             video.repaint();
             i++;
         }
+        Main.main.mainPanel.playerPanel.repaint();
         revalidate();
         repaint();
     }
@@ -55,6 +56,12 @@ public class PlayListPanel extends JPanel {
             add(video);
             resized();
         }
+    }
+
+    @Override
+    public void update(Graphics g) {
+        super.update(g);
+        paint(g);
     }
 
     @Override

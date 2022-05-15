@@ -18,7 +18,7 @@ public class Main extends JFrame implements Runnable {
         System.out.println("Starting YST Audio Downloader...");
         if(!tmp.exists())
             tmp.mkdirs();
-        EventQueue.invokeAndWait(() -> {
+        SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception ex) {
@@ -42,8 +42,7 @@ public class Main extends JFrame implements Runnable {
             @Override
             public void componentResized(ComponentEvent e) {
                 mainPanel.playListPanel.resized();
-                if(playerManager.video != null)
-                    mainPanel.playerPanel.createBackground();
+                mainPanel.playerPanel.resized();
             }
         });
         setMinimumSize(d);
